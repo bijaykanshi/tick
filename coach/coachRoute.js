@@ -6,7 +6,7 @@ module.exports = function(router, fs, mongodb) {
     	mongodb.executeQuery(req, res);
     });
     router.get('/getDummyJson', function(req, res) {
-    	fs.readFile('./client/coach/json/dummy.json', function(err, data) {
+    	fs.readFile('./webdata/coach/json/dummy.json', function(err, data) {
     		if (err) throw err
     		var obj = JSON.parse(data)
     		res.json(obj);
