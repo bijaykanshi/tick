@@ -11,7 +11,7 @@ var jsonfile = require('jsonfile')
 var util = require('util')
 require('./config')(app);
 require('./route/routes')(app, dbconnection);
-var coachRoute = require('./route/coach/coachRoute')(router, fs, path, jsonfile, util, mongodb);
+var coachRoute = require('./route/coach/coachRoute')(router, fs, path, jsonfile, dbconnection, mongodb);
 app.use('/coach', coachRoute);
 require('./chat')(io, dbconnection);
 console.log('Your application is running on http://localhost:' + port);

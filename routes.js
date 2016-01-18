@@ -38,16 +38,17 @@ module.exports = function(app, dbconnection) {
 			query += 'SELECT * FROM users WHERE EXISTS(SELECT name FROM users WHERE email ='+ "'"+req.body.email+"'"+ ' and password =' + "'"+req.body.password+"'" + ' );';
 			
 		} else {
-			query = 'insert into users ( name , password, email, lattitude, longitude, country, state, district, Pin_Code, msg, contact_No, Address) values ('+"'"+req.body.name+"'"+','+"'"+req.body.password+"'"+','+"'"+req.body.email+"'"+','+"'"+req.body.myPos.lat+"'"+','+"'"+req.body.myPos.lng+"'"+','+"'"+req.body.country+"'"+','+"'"+req.body.state+"'"+','+"'"+req.body.district+"'"+','+"'"+req.body.Pin_Code+"'"+','+"'"+req.body.msg+"'"+','+"'"+req.body.contact_No+"'"+','+"'"+req.body.Address+"'"+');';
+			query = 'insert into users ( name , password, email, lattitude, longitude, country, state, district, Pin_Code, msg, contact_No, Address, org, sex) values ('+"'"+req.body.name+"'"+','+"'"+req.body.password+"'"+','+"'"+req.body.email+"'"+','+"'"+req.body.myPos.lat+"'"+','+"'"+req.body.myPos.lng+"'"+','+"'"+req.body.country+"'"+','+"'"+req.body.state+"'"+','+"'"+req.body.district+"'"+','+"'"+req.body.Pin_Code+"'"+','+"'"+req.body.msg+"'"+','+"'"+req.body.contact_No+"'"+','+"'"+req.body.Address+"'"+','+"'"+req.body.org+"'"+','+req.body.sex+');';
 			query1 = 'insert into skillProfession  values';
 			req.body.professionSkill.Profession.forEach(function(x){query1 += '(LAST_INSERT_ID() ,' + "'" + x +"'" + ', false),'  });
 			req.body.professionSkill.Skills.forEach(function(x){query1 += '(LAST_INSERT_ID() ,' + "'" + x +"'" + ', true),'  });
 			query += query1.substring(0, query1.length-1) + ';';
-			console.log (query);
+			//console.log (query);
 			/*arr = [storeProc, 'BEGIN', query, query1, 'END'];
 			dbconnection.storedProcedure(query, query1, dec, res, req, arr);*/
 		}
-		dbconnection.applyQueryIntoDataBase(query, dec, res, req);
+		console.log('email' + req.body.email);
+		dbconnection.applyQueryIntoDataBase(query, dec, res, req, req.body.email);
 		
 	});
 	app.get('/getPeopleListBasedOnCity', function(req, res) {

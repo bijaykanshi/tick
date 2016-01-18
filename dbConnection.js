@@ -1,5 +1,6 @@
 var fs = require('fs');
 var mysql = require('mysql');
+var path = require('path');
 
 var dbconnection = {};
 
@@ -11,17 +12,25 @@ dbconnection.pool =  mysql.createPool({
 	multipleStatements: true
 });
 //mysql.createConnection( { multipleStatements: true } );
-dbconnection.applyQueryIntoDataBase = function (query, decision, res, req) {
+dbconnection.error = {};
+dbconnection.error.error = true;
+dbconnection.applyQueryIntoDataBase = function (query, decision, res, req, data) {
 	console.log(query);if (dbconnection.a || dbconnection.az){res.send('');return;}
 
 	
 	dbconnection.pool.getConnection(function(err, connection) {
 				if (err) {
 					console.log('...........................error...............');
+					dbconnection.error.msg = err;
 					res.send('error');
 				}
 				connection.query( query,  function(err, rows) {
-				  	dbconnection.sendResponse(rows, decision, res, req);
+					if (err) {
+						dbconnection.error.msg = err;
+						res.send(dbconnection.error);
+					} else {
+						dbconnection.sendResponse(rows, decision, res, req, data);
+					}
 				});
 			
 		connection.release();
@@ -48,7 +57,7 @@ dbconnection.storedProcedure = function (query, query1, decision, res, req, arr)
 		connection.release();
 	});
 };
-dbconnection.sendResponse = function(rows, decision, res, req) {
+dbconnection.sendResponse = function(rows, decision, res, req, data) {
 	var response = {};
 	response.success = true;
 	switch(decision) {
@@ -79,12 +88,25 @@ dbconnection.sendResponse = function(rows, decision, res, req) {
 	      case 'filterPeople':
 	     	res.send(rows);
 	     	break;
+	    case 'coach':
+	    	dbconnection.createJson(data);
+	     	res.send(response);
+	     	break;
 	    default:
 	    	if (res) {
-	    		res.send(response);
+	    		res.send(rows || response);
 	    	}
 	}
 };
+dbconnection.createJson =  function (data) {
+	var jsonPath = path.join(__dirname, '..', 'serverData', 'coach', 'json');
+	fs.createReadStream(path.join(jsonPath, 'defaultWebsite.json')).pipe(fs.createWriteStream(path.join(jsonPath, data + '.json')));
+	/*fs.readFile(path.join(jsonPath, 'defaultWebsite.json'), function(err, data) {
+        if (err) throw err
+        var obj = JSON.parse(data)
+        res.json(obj);
+    });*/
+}
 dbconnection.first =  'index';
 module.exports =  dbconnection;
    
