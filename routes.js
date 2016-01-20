@@ -37,8 +37,17 @@ module.exports = function(app, dbconnection) {
 	    	}
 			query += 'SELECT * FROM users WHERE EXISTS(SELECT name FROM users WHERE email ='+ "'"+req.body.email+"'"+ ' and password =' + "'"+req.body.password+"'" + ' );';
 			
+		} else if (dec === 'edit_website') {
+			query = 'SELECT access_token FROM users WHERE email ='+ "'"+req.body.email+"'"+ ' and password =' + "'"+req.body.password+"'" + ';';
+			
 		} else {
-			query = 'insert into users ( name , password, email, lattitude, longitude, country, state, district, Pin_Code, msg, contact_No, Address, org, sex) values ('+"'"+req.body.name+"'"+','+"'"+req.body.password+"'"+','+"'"+req.body.email+"'"+','+"'"+req.body.myPos.lat+"'"+','+"'"+req.body.myPos.lng+"'"+','+"'"+req.body.country+"'"+','+"'"+req.body.state+"'"+','+"'"+req.body.district+"'"+','+"'"+req.body.Pin_Code+"'"+','+"'"+req.body.msg+"'"+','+"'"+req.body.contact_No+"'"+','+"'"+req.body.Address+"'"+','+"'"+req.body.org+"'"+','+req.body.sex+');';
+			var random,
+				parameterToPass = {};
+			if (dec === 'coach') {
+				random = Math.floor(Math.random() * 1000000000);
+				parameterToPass.access_token = req.body.email + random;
+			}
+			query = 'insert into users ( name , password, email, lattitude, longitude, country, state, district, Pin_Code, msg, contact_No, Address, org, sex, access_token) values ('+"'"+req.body.name+"'"+','+"'"+req.body.password+"'"+','+"'"+req.body.email+"'"+','+"'"+req.body.myPos.lat+"'"+','+"'"+req.body.myPos.lng+"'"+','+"'"+req.body.country+"'"+','+"'"+req.body.state+"'"+','+"'"+req.body.district+"'"+','+"'"+req.body.Pin_Code+"'"+','+"'"+req.body.msg+"'"+','+"'"+req.body.contact_No+"'"+','+"'"+req.body.Address+"'"+','+"'"+req.body.org+"'"+','+req.body.sex+','+"'"+random+"'"+');';
 			query1 = 'insert into skillProfession  values';
 			req.body.professionSkill.Profession.forEach(function(x){query1 += '(LAST_INSERT_ID() ,' + "'" + x +"'" + ', false),'  });
 			req.body.professionSkill.Skills.forEach(function(x){query1 += '(LAST_INSERT_ID() ,' + "'" + x +"'" + ', true),'  });
@@ -46,9 +55,10 @@ module.exports = function(app, dbconnection) {
 			//console.log (query);
 			/*arr = [storeProc, 'BEGIN', query, query1, 'END'];
 			dbconnection.storedProcedure(query, query1, dec, res, req, arr);*/
+			parameterToPass.email = req.body.email;
 		}
 		console.log('email' + req.body.email);
-		dbconnection.applyQueryIntoDataBase(query, dec, res, req, req.body.email);
+		dbconnection.applyQueryIntoDataBase(query, dec, res, req, parameterToPass);
 		
 	});
 	app.get('/getPeopleListBasedOnCity', function(req, res) {

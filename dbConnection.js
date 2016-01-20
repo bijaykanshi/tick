@@ -90,6 +90,7 @@ dbconnection.sendResponse = function(rows, decision, res, req, data) {
 	     	break;
 	    case 'coach':
 	    	dbconnection.createJson(data);
+	    	response.access_token = data.access_token;
 	     	res.send(response);
 	     	break;
 	    default:
@@ -100,7 +101,7 @@ dbconnection.sendResponse = function(rows, decision, res, req, data) {
 };
 dbconnection.createJson =  function (data) {
 	var jsonPath = path.join(__dirname, '..', 'serverData', 'coach', 'json');
-	fs.createReadStream(path.join(jsonPath, 'defaultWebsite.json')).pipe(fs.createWriteStream(path.join(jsonPath, data + '.json')));
+	fs.createReadStream(path.join(jsonPath, 'defaultWebsite.json')).pipe(fs.createWriteStream(path.join(jsonPath, data.email + '.json')));
 	/*fs.readFile(path.join(jsonPath, 'defaultWebsite.json'), function(err, data) {
         if (err) throw err
         var obj = JSON.parse(data)
