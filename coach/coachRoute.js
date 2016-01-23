@@ -1,7 +1,9 @@
 
-module.exports = function(router, fs, path, jsonfile, dbconnection, mongodb) {
+module.exports = function(ref) {
+    var path = ref.path;
     var jsonPath = path.join(__dirname, '..', '..', 'serverData', 'coach', 'json');
     var query = '';
+    var fs = ref.fs;
     console.log(jsonPath);
     var routingData = [{
             'url': '/',
@@ -38,8 +40,10 @@ module.exports = function(router, fs, path, jsonfile, dbconnection, mongodb) {
             'method': 'post',
             'callbackFun':  function(req, res) {
                 console.log('getting');
-                jsonfile.writeFile(path.join(jsonPath, 'defaultWebsite.json'), req.body.data, function (err) {
-                  console.error(err)
+                console.log(req.body.email);
+                ref.jsonfile.writeFile(path.join(jsonPath, req.body.email + '.json'), req.body.data, function (err) {
+                  console.log(err);
+                  console.log('error in writing');
                 });
                 res.send('success');
             }
@@ -49,15 +53,19 @@ module.exports = function(router, fs, path, jsonfile, dbconnection, mongodb) {
             'method': 'get',
             'callbackFun':  function(req, res) {
                 query = 'select * from users where org is NOT NULL';
-                dbconnection.applyQueryIntoDataBase(query, 'getOrg', res);
+                ref.dbconnection.applyQueryIntoDataBase(query, 'getOrg', res);
             }
         },
         {
             'url': '/getWebsiteJson',
             'method': 'get',
             'callbackFun':  function(req, res) {
-                console.log(req.query.email);
-                fs.readFile(path.join(jsonPath, req.query.email + '.json'), function(err, data) {
+                var query1 = ref.url.parse(req.url, true).query;
+                console.log(query1);
+                console.log(req.query.email, req.body.email);
+                var finalPath = path.join(jsonPath, query1.email + '.json');
+                console.log('finalPath' + finalPath);
+                fs.readFile(finalPath, function(err, data) {
                     if (err) throw err
                     var obj = JSON.parse(data);
                     res.json(obj);
@@ -96,9 +104,9 @@ module.exports = function(router, fs, path, jsonfile, dbconnection, mongodb) {
         res.send('success');
     });*/
     routingData.forEach(function(obj) {
-       router[obj.method](obj.url, obj.callbackFun); 
+       ref.router[obj.method](obj.url, obj.callbackFun); 
     });
-    return router; 
+    return ref.router; 
 };
 
 
