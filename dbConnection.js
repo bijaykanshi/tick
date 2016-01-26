@@ -71,6 +71,7 @@ dbconnection.sendResponse = function(rows, decision, res, req, data) {
 	    		query = ' update users set lattitude = "'+ myPos.lat +'", longitude = "'+ myPos.lng +'" online = true where email = "' + req.body.email + '";';
 	    		dbconnection.applyQueryIntoDataBase(query, 'updateLatLng', res, req);
 	    	}*/
+	    	console.log('login bijay')
 	        res.send(rows);
 	        break;
 	     case 'updateLatLng':
